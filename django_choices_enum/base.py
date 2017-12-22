@@ -1,6 +1,7 @@
 import enum
 
-class ChoicesEnumMeta(type(enum.Enum)):
+
+class ChoicesEnumMeta(enum.EnumMeta):
     def __new__(metacls, cls, bases, classdict):
         if type(classdict) is dict:
             original_dict = classdict
@@ -8,7 +9,7 @@ class ChoicesEnumMeta(type(enum.Enum)):
             for k, v in original_dict.items():
                 classdict[k] = v
 
-        if '__getitem__'  not in classdict:
+        if '__getitem__' not in classdict:
             classdict['__getitem__'] = lambda self, idx: [self.value, self.display][idx]
         if '__len__' not in classdict:
             classdict['__len__'] = lambda self: 2
@@ -18,7 +19,7 @@ class ChoicesEnumMeta(type(enum.Enum)):
     @staticmethod
     def _find_new_(classdict, obj_type, first_enum):
         def new(enum_class, db, display=None):
-            real_new, save_new, use_args = type(enum.Enum)._find_new_(classdict, obj_type, first_enum)
+            real_new, save_new, use_args = super()._find_new_(classdict, obj_type, first_enum)
             if not use_args:
                 enum_item = real_new(enum_class)
                 enum_item._value_ = db
@@ -30,9 +31,8 @@ class ChoicesEnumMeta(type(enum.Enum)):
             return enum_item
         return new, False, True
 
-class ChoicesEnum(enum.Enum):
-    __metaclass__ = ChoicesEnumMeta
 
+class ChoicesEnum(enum.Enum, metaclass=ChoicesEnumMeta):
     @classmethod
     def choices(cls):
         return [(v.value, v.display) for _, v in cls._member_map_.items()]
