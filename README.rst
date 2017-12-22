@@ -1,8 +1,7 @@
 django-choices-enum
 ===================
 
-django-choices-enum allows the usage of the 2.x backport of Python 3.4's enum
-package (enum34) as choices in Django models.
+django-choices-enum allows the usage of the 3.x as choices in Django models.
 
     from django.db import models
     from django_choices_enum import ChoicesEnum
